@@ -21,7 +21,9 @@ execute:
 -   `csv` Example 1
 
 ```{r}
-#| label: wd-1-csv-1
+#| label: wd-1-csv-1 #Lab 2 Q1
+
+surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 
 ```
 
@@ -229,8 +231,16 @@ The following assignments satisfy the above criteria:
 -   Example of **ggplot2** plotting
 
 ```{r}
-#| label: r-2-1
+#| label: r-2-1 
 
+# Lab 2 Q8 - Q16
+
+ggplot(data = surveys,
+  mapping = aes(x=weight, y= species)) +
+  geom_jitter(color = "steelblue", alpha = 0.3) +
+  geom_boxplot(outliers = FALSE) +
+  labs(x= "Weight(g)", y= "Species", title = "The Relationship between Rodent Species and Weight") +
+  theme( plot.title = element_text(size = 18),axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16), panel.grid.minor = element_blank())
 ```
 
 -   Example of **dplyr** pipeline
@@ -544,6 +554,10 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dsm-2-1
+
+#Lab 2 Q17
+
+summary(aov(weight ~ species, data = surveys))
 
 ```
 
