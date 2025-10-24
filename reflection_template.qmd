@@ -30,7 +30,13 @@ surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 -   `csv` Example 2
 
 ```{r}
-#| label: wd-1-csv-2
+#| label: wd-1-csv-2 #Lab 4 Q0
+
+childcare_costs <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/childcare_costs.csv')
+
+counties <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/counties.csv')
+
+tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/instructions/data/ca_tax_revenue.csv')
 
 ```
 
@@ -70,6 +76,17 @@ surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+
+# Lab 4 Question 5
+region_median_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarise(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = study_year,
+    values_from = median_income) |>
+  arrange(desc(`2018`)) |>
+  rename(Median_Income_2008 = `2008`,
+         Median_Income_2018 = `2018`)
 
 ```
 
@@ -211,6 +228,18 @@ surveys <- read_csv(here::here("Week 2", "surveys.csv"))
 
 ```{r}
 #| label: wd-7-wide
+
+#Lab 4 Question 5
+
+region_median_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarise(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = study_year,
+    values_from = median_income) |>
+  arrange(desc(`2018`)) |>
+  rename(Median_Income_2008 = `2008`,
+         Median_Income_2018 = `2018`)
 
 ```
 
@@ -394,6 +423,18 @@ ggplot(data = surveys,
 
 ```{r}
 #| label: dvs-5-1
+
+#Lab 4 Question 5
+
+region_median_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarise(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = study_year,
+    values_from = median_income) |>
+  arrange(desc(`2018`)) |>
+  rename(Median_Income_2008 = `2008`,
+         Median_Income_2018 = `2018`)
 
 ```
 
