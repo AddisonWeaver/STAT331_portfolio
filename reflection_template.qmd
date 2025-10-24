@@ -45,6 +45,9 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 ```{r}
 #| label: wd-1-xlsx
 
+
+#Need this in the future
+
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
@@ -53,6 +56,24 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-2-ex-1
+
+#Lab 4 Question 7
+
+recreate_plot <- ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
+  
 
 ```
 
@@ -95,6 +116,19 @@ region_median_income <- ca_childcare |>
 ```{r}
 #| label: wd-3-numeric-ex-1
 
+#Lab 3 Question 10
+
+teacher_evals_clean |> 
+  filter(question_no == 901) |>
+  group_by(teacher_id) |>
+  summarise(numOfCourses = n_distinct(course_id), 
+            avg_for_all = mean(SET_score_avg),
+            .groups = "drop")|>
+  filter(numOfCourses >= 5) |>
+  mutate(typemaxmin = case_when(
+    avg_for_all == max(avg_for_all) ~ "Highest",
+    avg_for_all == min(avg_for_all) ~ "Lowest")) |>
+  filter(!is.na(typemaxmin))
 ```
 
 -   Character Example 1 (any context)
@@ -108,6 +142,18 @@ region_median_income <- ca_childcare |>
 
 ```{r}
 #| label: wd-3-string
+
+#Lab 5
+second_witness_interview <- interview |>
+  inner_join(person, by = c("person_id" = "id"))|>
+  filter(str_detect(name, "Annabel"),
+                    address_street_name == "Franklin Ave")|>
+  select(name, transcript) |>
+  mutate(result = str_c(name, ": ", transcript)) |>
+  pull(result) #found 2nd witness's interview and read its description
+
+second_witness_interview
+  
 
 ```
 
@@ -124,7 +170,19 @@ region_median_income <- ca_childcare |>
 
 ```{r}
 #| label: wd-4-numeric-ex-1
+#Lab 3 Question 10
 
+teacher_evals_clean |> 
+  filter(question_no == 901) |>
+  group_by(teacher_id) |>
+  summarise(numOfCourses = n_distinct(course_id), 
+            avg_for_all = mean(SET_score_avg),
+            .groups = "drop")|>
+  filter(numOfCourses >= 5) |>
+  mutate(typemaxmin = case_when(
+    avg_for_all == max(avg_for_all) ~ "Highest",
+    avg_for_all == min(avg_for_all) ~ "Lowest")) |>
+  filter(!is.na(typemaxmin))
 ```
 
 -   Numeric Example 2
@@ -185,7 +243,17 @@ recreate_plot <- ca_childcare |>
 
 ```{r}
 #| label: wd-4-string
+ # Lab 5
+second_witness_interview <- interview |>
+  inner_join(person, by = c("person_id" = "id"))|>
+  filter(str_detect(name, "Annabel"),
+                    address_street_name == "Franklin Ave")|>
+  select(name, transcript) |>
+  mutate(result = str_c(name, ": ", transcript)) |>
+  pull(result) #found 2nd witness's interview and read its description
 
+second_witness_interview
+  
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -425,6 +493,23 @@ ggplot(data = surveys,
 ```{r}
 #| label: dvs-3-2
 
+#Challenge 4
+ggplot(data = summary_table, aes(x = `Age_Group`, y = `Median_Price`, fill = `Care_Type`)) +
+geom_col(position = "dodge", width = 0.8) +
+geom_text(
+    aes(label = paste0("$", Median_Price)),
+    position = position_dodge(width = 0.8), vjust = -0.4, size = 2.5) + # I googles moving the labels on top of columns
+scale_fill_manual(values = c(
+  "Center-based" = "#53868B", # https://r-charts.com/colors for colors
+  "Family-based" = "#66CDAA"
+)) +
+  facet_wrap(~ study_year, nrow = 1) +
+labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \nHas Increased Throughout A Decade",
+     x = "Age Group",
+     y =NULL,
+     subtitle = "Median Weekly Full Time Price ($)",
+     fill = "Care Type") 
+
 ```
 
 -   I can choose creative geometries (e.g., `geom_segment()`, `geom_ribbon)()`)
@@ -484,6 +569,30 @@ region_median_income <- ca_childcare |>
 
 ```{r}
 #| label: dvs-6-ex-1
+
+#Challenge 4
+
+summary_table<- ca_childcare |>
+  filter(study_year %in% c(2008,2018)) |>
+  pivot_longer(
+    cols = c(mc_infant, mc_toddler, mc_preschool, mfcc_infant, mfcc_toddler, mfcc_preschool),
+    names_to = c("Care_Type", "Age_Group"),
+    names_sep = "_", 
+    values_to = "Median_Price") |>
+  mutate(
+    Care_Type = case_when(Care_Type == "mc" ~ "Center-based",
+                          Care_Type == "mfcc" ~ "Family-based"),
+    Age_Group = case_when(Age_Group == "infant" ~ "Infant",
+                          Age_Group == "toddler" ~ "Toddler",
+                          Age_Group == "preschool" ~ "Preschool"),
+    Age_group = fct_relevel(Age_Group, "Infant", "Toddler", "Preschool")) |>
+  group_by(Age_Group, study_year, Care_Type) |>
+  summarise(Median_Price = median(Median_Price), .groups = "drop") 
+
+#used https://tidyr.tidyverse.org/reference/pivot_longer.html documentation for help
+
+options(pillar.sigfig = 5) # I looked up "how to have tibble show more than 4 numeric digits" on google = first result
+print(summary_table, n = Inf, width = Inf)
 
 ```
 
