@@ -81,6 +81,12 @@ recreate_plot <- ca_childcare |>
 
 ```{r}
 #| label: wd-2-ex-2
+#Lab 3 Question 5 Modified for removing specific columns
+teacher_evals_clean <- evals |>
+  rename(sex = gender) |>
+  filter(no_participants >= 10) |>
+  select(-c(stud_grade_avg, stud_grade_std, stud_grade_var_coef, percent_failed, stud_grade_avg_cur, stud_grade_std_cur, stud_grade_var_coef_cur, class_duration, weekday, time_of_day, SET_score_1sem, maximum_score)) |>
+  mutate(teacher_id = as.character(teacher_id))
 
 ```
 
@@ -88,6 +94,24 @@ recreate_plot <- ca_childcare |>
 
 ```{r}
 #| label: wd-2-ex-3
+
+#Lab 4 Question 7 (starts_with() for selecting cols for pivot_longer)
+recreate_plot <- ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
+  
+
 
 ```
 
@@ -136,6 +160,17 @@ teacher_evals_clean |>
 ```{r}
 #| label: wd-3-character
 
+#Lab 5
+first_witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
+  inner_join(person, by = c("person_id" = "id")) |>
+  filter(address_street_name == "Northwestern Dr",
+         address_number == max(address_number)) |>
+  select(name, transcript) |>
+  mutate(result = str_c(name, ": ", transcript)) |>
+  pull(result) # found the interview with the person who was a witness (two witnesses)
+  
+first_witness_interview
+
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
@@ -160,8 +195,23 @@ second_witness_interview
 -   Date (example must use functions from **lubridate**)
 
 ```{r}
-#| label: wd-3-date
+#| label: wd-3-date 
 
+#Lab 5 Modified to include lubridate functions
+
+who_hired <- person |>
+  inner_join(drivers_license, by = c("license_id" = "id")) |>
+  inner_join(facebook_event_checkin, by = c("id" = "person_id")) |> #based on jeremy's testimony, searched for the hirer.
+  mutate(date = ymd(date))|>
+  filter(
+    hair_color == "red",
+    gender == "female",
+    car_make == "Tesla",
+    car_model == "Model S",
+    event_name == "SQL Symphony Concert",
+    year(date) == 2018, month(date) == 12
+  )
+who_hired
 ```
 
 **WD-4: I can modify existing variables and create new variables in a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -189,6 +239,16 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: wd-4-numeric-ex-2
+
+#Challenge 3
+teacher_evals_compare <- teacher_evals |>
+  filter(question_no == 903 ) |>
+  mutate(set_level = if_else(SET_score_avg >= 4, "excellent", "standard"), 
+         sen_level = case_when(
+      seniority <= 4 ~ "junior",
+      seniority <= 8 ~ "senior",
+      seniority > 8  ~ "very senior")) |>
+  select(course_id, set_level, sen_level)
 
 ```
 
@@ -261,6 +321,22 @@ second_witness_interview
 ```{r}
 #| label: wd-4-date
 
+#Lab 5 Modified to include lubridate functions
+
+who_hired <- person |>
+  inner_join(drivers_license, by = c("license_id" = "id")) |>
+  inner_join(facebook_event_checkin, by = c("id" = "person_id")) |> #based on jeremy's testimony, searched for the hirer.
+  mutate(date = ymd(date))|>
+  filter(
+    hair_color == "red",
+    gender == "female",
+    car_make == "Tesla",
+    car_model == "Model S",
+    event_name == "SQL Symphony Concert",
+    year(date) == 2018, month(date) == 12
+  )
+who_hired
+
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -269,6 +345,10 @@ second_witness_interview
 
 ```{r}
 #| label: wd-5-left-ex-1
+#| 
+#Lab 3 Question 3
+ca_childcare <- ca_childcare |>
+  left_join(tax_rev, by = c("county_name" = "entity_name", "study_year" = "year"))
 
 ```
 
@@ -276,13 +356,21 @@ second_witness_interview
 
 ```{r}
 #| label: wd-5-right
-
+#Lab 3 Question 3 Modified for a right join
+ca_childcare <- tax_rev |>
+  right_join(ca_childcare, by = c("entity_name" = "county_name", "year" = "study_year"))
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
 
 ```{r}
 #| label: wd-5-left-right-ex-2
+
+#Lab 4 Question 2
+ca_childcare <- childcare_costs |> 
+  left_join(counties, by = "county_fips_code") |>
+  filter(state_name == "California")
+
 
 ```
 
@@ -291,12 +379,36 @@ second_witness_interview
 ```{r}
 #| label: wd-5-inner-ex-1
 
+#Lab 5
+first_witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
+  inner_join(person, by = c("person_id" = "id")) |>
+  filter(address_street_name == "Northwestern Dr",
+         address_number == max(address_number)) |>
+  select(name, transcript) |>
+  mutate(result = str_c(name, ": ", transcript)) |>
+  pull(result) # found the interview with the person who was a witness (two witnesses)
+  
+first_witness_interview
 ```
 
 -   `inner_join()` Example 2
 
 ```{r}
 #| label: wd-5-inner-ex-2
+#Lab 5
+suspects <- get_fit_now_member |>
+  rename(member_id = id, member_name = name) |>
+  inner_join(get_fit_now_check_in, by = c("member_id" = "membership_id")) |>
+  inner_join(person, by = c("person_id" = "id")) |>
+  inner_join(drivers_license, by = c("license_id" = "id")) |> #had to get all the speific data to filter through all the data tables
+  filter(
+    membership_status == "gold",
+    str_starts(member_id, "48Z"),
+    check_in_date == "20180109",
+    str_detect(plate_number, "H42W")
+  ) |>
+  pull(member_name) #searched for suspects using both of the witnesses testimony with filter
+suspects
 
 ```
 
@@ -322,6 +434,23 @@ second_witness_interview
 
 ```{r}
 #| label: wd-7-long
+
+#Lab 4 Question 7 (without ggplot for space)
+recreate_plot <- ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
+  
 
 ```
 
@@ -350,11 +479,12 @@ region_median_income <- ca_childcare |>
 
 The following assignments satisfy the above criteria:
 
--   Example 1
--   Example 2
--   Example 3
--   Example 4
--   Example 5
+-   Lab 2
+-   lab 3
+-   Lab 4
+-   Lab 5
+-   Challenge 4
+-   Among others
 
 **R-2: I can write well documented and tidy code.**
 
@@ -371,12 +501,25 @@ ggplot(data = surveys,
   geom_boxplot(outliers = FALSE) +
   labs(x= "Weight(g)", y= "Species", title = "The Relationship between Rodent Species and Weight") +
   theme( plot.title = element_text(size = 18),axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16), panel.grid.minor = element_blank())
+
 ```
 
 -   Example of **dplyr** pipeline
 
 ```{r}
 #| label: r-2-2
+
+#Lab 4 Question 5 Modified to not save the variable
+
+ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarise(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = study_year,
+              values_from = median_income) |>
+  arrange(desc(`2018`)) |>
+  rename(Median_Income_2008 = `2008`,
+         Median_Income_2018 = `2018`)
 
 ```
 
@@ -393,6 +536,16 @@ ggplot(data = surveys,
 
 ```{r}
 #| label: r-3-example
+#Lab 4 Question 5
+ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarise(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = study_year,
+              values_from = median_income) |>
+  arrange(desc(`2018`)) |>
+  rename(Median_Income_2008 = `2008`,
+         Median_Income_2018 = `2018`)
 
 ```
 
@@ -411,6 +564,17 @@ ggplot(data = surveys,
 
 ```{r}
 #| label: dvs-1-num
+#Lab 4 Question 8
+regression_plot <- ca_childcare |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  ggplot(aes(x = mhi_2018, y = mc_infant)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Median Income and Infant Childcare Prices have Positive Relationship",
+       x = "Median Household Income ($)",
+       y = NULL,
+       subtitle = "Median Weekly Prices for Infant Center-Based Childcare ($)")
+regression_plot
 
 ```
 
@@ -419,12 +583,63 @@ ggplot(data = surveys,
 ```{r}
 #| label: dvs-2-num-cat
 
+#Challenge 4
+ggplot(data = summary_table, aes(x = `Age_Group`, y = `Median_Price`, fill = `Care_Type`)) +
+geom_col(position = "dodge", width = 0.8) +
+geom_text(
+    aes(label = paste0("$", Median_Price)),
+    position = position_dodge(width = 0.8), vjust = -0.4, size = 2.5) + # I googles moving the labels on top of columns
+scale_fill_manual(values = c(
+  "Center-based" = "#53868B", # https://r-charts.com/colors for colors
+  "Family-based" = "#66CDAA"
+)) +
+  facet_wrap(~ study_year, nrow = 1) +
+labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \nHas Increased Throughout A Decade",
+     x = "Age Group",
+     y =NULL,
+     subtitle = "Median Weekly Full Time Price ($)",
+     fill = "Care Type") 
+
 ```
 
 -   At least two categorical variables
 
 ```{r}
 #| label: dvs-2-cat
+
+#lab 4 Question 7
+
+recreate_plot <- ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
+  
+
+ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth() +
+  scale_color_manual(values = colors_plot) +
+  scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
+  scale_y_continuous(breaks = seq(0, 500, by = 100)) +
+  facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
+  labs( title = "Weekly Median Price for Center-Based Childcare ($)",
+        x = "Study Year",
+        y= NULL ,
+        color = "California Region") +
+  theme(aspect.ratio = 1,
+        legend.position = "right",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 7))
 
 ```
 
@@ -441,6 +656,22 @@ ggplot(data = surveys,
 
 ```{r}
 #| label: dvs-2-ex-1
+#Lab 4 Question 7 (cut down for space)
+ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth() +
+  scale_color_manual(values = colors_plot) +
+  scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
+  scale_y_continuous(breaks = seq(0, 500, by = 100)) +
+  facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
+  labs( title = "Weekly Median Price for Center-Based Childcare ($)",
+        x = "Study Year",
+        y= NULL ,
+        color = "California Region") +
+  theme(aspect.ratio = 1,
+        legend.position = "right",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 7))
 
 ```
 
@@ -449,12 +680,49 @@ ggplot(data = surveys,
 ```{r}
 #| label: dvs-2-ex-2
 
+#Lab 4 Question 7
+colors_plot <- colorRampPalette(brewer.pal(7, "Accent"))(10)
+ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth() +
+  scale_color_manual(values = colors_plot) +
+  scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
+  scale_y_continuous(breaks = seq(0, 500, by = 100)) +
+  facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
+  labs( title = "Weekly Median Price for Center-Based Childcare ($)",
+        x = "Study Year",
+        y= NULL ,
+        color = "California Region") +
+  theme(aspect.ratio = 1,
+        legend.position = "right",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 7))
+
+
 ```
 
 -   I can modify my plot titles to clearly communicate the data context
 
 ```{r}
 #| label: dvs-2-ex-3
+
+#Challenge 4
+ggplot(data = summary_table, aes(x = `Age_Group`, y = `Median_Price`, fill = `Care_Type`)) +
+geom_col(position = "dodge", width = 0.8) +
+geom_text(
+    aes(label = paste0("$", Median_Price)),
+    position = position_dodge(width = 0.8), vjust = -0.4, size = 2.5) + # I googles moving the labels on top of columns
+scale_fill_manual(values = c(
+  "Center-based" = "#53868B", # https://r-charts.com/colors for colors
+  "Family-based" = "#66CDAA"
+)) +
+  facet_wrap(~ study_year, nrow = 1) +
+labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \nHas Increased Throughout A Decade",
+     x = "Age Group",
+     y =NULL,
+     subtitle = "Median Weekly Full Time Price ($)",
+     fill = "Care Type") 
+
 
 ```
 
@@ -463,12 +731,56 @@ ggplot(data = surveys,
 ```{r}
 #| label: dvs-2-ex-4
 
+# Challenge 2 Spicy Option
+ggplot(data = surveys,
+  mapping = aes(x=weight, y= species)) +
+  geom_jitter(color = "steelblue", alpha = 0.3) +
+  geom_boxplot(outliers = FALSE) +
+  labs(x= "Weight(g)", y= "Species", title = "The Relationship between Rodent Species and Weight") +
+  theme( plot.title = element_text(size = 14),axis.title.x = element_text(size = 12), axis.title.y = element_text(size = 12), panel.grid.minor = element_blank())
+
+
 ```
 
 -   I can reorder my legend to align with the colors in my plot
 
 ```{r}
 #| label: dvs-2-ex-5
+
+#Lab 4 Question 7
+
+colors_plot <- colorRampPalette(brewer.pal(7, "Accent"))(10)
+
+recreate_plot <- ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
+
+ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth() +
+  scale_color_manual(values = colors_plot) +
+  scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
+  scale_y_continuous(breaks = seq(0, 500, by = 100)) +
+  facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
+  labs( title = "Weekly Median Price for Center-Based Childcare ($)",
+        x = "Study Year",
+        y= NULL ,
+        color = "California Region") +
+  theme(aspect.ratio = 1,
+        legend.position = "right",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 7))
 
 ```
 
@@ -710,6 +1022,38 @@ print(summary_table, n = Inf, width = Inf)
 
 ```{r}
 #| label: pe-4-2
+#Lab 4 Question 7 modified for pipeline to ggplot()
+
+ca_childcare |>
+  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  filter(study_year >= 2008, study_year <= 2018) |>
+  pivot_longer(
+    cols = starts_with("mc_"),
+    names_to = "age_group",
+    values_to = "median_price"
+  ) |>
+  mutate(age_group = fct_collapse(age_group,
+                                  "Infant" = "mc_infant",
+                                  "Toddler" = "mc_toddler",
+                                  "Preschool"= "mc_preschool"),
+    age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
+    region = fct_reorder2(region, study_year, median_price, .desc = TRUE)) |>
+  
+  ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth() +
+  scale_color_manual(values = colors_plot) +
+  scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
+  scale_y_continuous(breaks = seq(0, 500, by = 100)) +
+  facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
+  labs( title = "Weekly Median Price for Center-Based Childcare ($)",
+        x = "Study Year",
+        y= NULL ,
+        color = "California Region") +
+  theme(aspect.ratio = 1,
+        legend.position = "right",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 7))
 
 ```
 
@@ -756,6 +1100,13 @@ chisq.test(teacher_evals_compare$set_level, teacher_evals_compare$sen_level)
 
 ```{r}
 #| label: dsm-2-3
+
+
+# Lab 1 Question 9
+t.test(len ~ supp, data = ToothGrowth,
+       alternative = "two.sided",
+       var.equal = FALSE,
+       conf.level = 0.95)
 
 ```
 
