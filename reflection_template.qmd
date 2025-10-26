@@ -418,6 +418,14 @@ suspects
 
 ```{r}
 #| label: wd-6-semi
+#Using Lab 5 data, Made Some Code for Semi-join for filtering for gym members who checked in on a specific date
+
+get_fit_now_member |>
+  semi_join(
+    get_fit_now_check_in |> filter(check_in_date == "20180109"),
+    by = c("id" = "membership_id")
+  )
+
 
 ```
 
@@ -425,6 +433,14 @@ suspects
 
 ```{r}
 #| label: wd-6-anti
+
+#Lab 5 datasets to write code for anti-join to filter out people who didnt attend the SQL Symphony concert
+
+person |>
+  anti_join(
+    facebook_event_checkin |> filter(event_name == "SQL Symphony Concert"),
+    by = c("id" = "person_id")
+  )
 
 ```
 
@@ -1049,6 +1065,12 @@ recreate_plot <- ca_childcare |>
 ```{r}
 #| label: pe-1-across
 
+#Lab 3 Question 7 Modified
+unique_instructors |>
+  summarise(across(c(academic_degree, seniority, sex),
+                   ~ list(table(.x)),
+                   .names = "{.col}_counts"))
+
 ```
 
 -   using functions from the `map()` family
@@ -1088,6 +1110,14 @@ recreate_plot <- ca_childcare |>
 ```{r}
 #| label: pe-3-across
 
+#Lab 4 Question 5 Modified not true 
+
+region_median_income <- ca_childcare |>
+  group_by(region, study_year) |>
+  summarise(across(c(mhi_2018, total_property_taxes, sales_and_use_taxes),
+                   ~ median(.x, na.rm = TRUE),
+                   .names = "median_{.col}"),
+            .groups = "drop")
 ```
 
 -   using a `map()` function with **one** input (e.g., `map()`, `map_chr()`, `map_dbl()`, etc.)
