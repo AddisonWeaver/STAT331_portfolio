@@ -434,7 +434,7 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-6-anti
 
-#Lab 5 datasets to write code for anti-join to filter out people who didnt attend the SQL Symphony concert
+#Lab 5 datasets to write code for anti-join to filter out people who didn't attend the SQL Symphony concert
 
 person |>
   anti_join(
@@ -500,7 +500,6 @@ The following assignments satisfy the above criteria:
 -   Lab 4
 -   Lab 5
 -   Challenge 4
--   Among others
 
 **R-2: I can write well documented and tidy code.**
 
@@ -900,7 +899,7 @@ teacher_evals_clean |>
 ```{r}
 #| label: dvs-4-across
 
-#Lab 4 Question 6 Modifiied for across()
+#Lab 4 Question 6 Modifiied for across() all age groups center based
 
 lowest_median_price <- ca_childcare |>
   filter(study_year == 2018) |>
@@ -1110,14 +1109,11 @@ unique_instructors |>
 ```{r}
 #| label: pe-3-across
 
-#Lab 4 Question 5 Modified not true 
-
-region_median_income <- ca_childcare |>
-  group_by(region, study_year) |>
-  summarise(across(c(mhi_2018, total_property_taxes, sales_and_use_taxes),
-                   ~ median(.x, na.rm = TRUE),
-                   .names = "median_{.col}"),
-            .groups = "drop")
+#Lab 3 Question 7 Modified
+unique_instructors |>
+  summarise(across(c(academic_degree, seniority, sex),
+                   ~ list(table(.x)),
+                   .names = "{.col}_counts"))
 ```
 
 -   using a `map()` function with **one** input (e.g., `map()`, `map_chr()`, `map_dbl()`, etc.)
@@ -1140,6 +1136,19 @@ region_median_income <- ca_childcare |>
 
 ```{r}
 #| label: pe-4-1
+
+#Challenge 3 Revised for not superseded functions like label_percent()
+ggplot(data = teacher_evals_compare, aes(x = sen_level, fill = set_level)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Evaluation of Teachers' Use Of Actvities",
+    x = "Years of Experience",
+    y = NULL,
+    fill = "Evaluation Rating") +
+  scale_y_continuous(labels = scales::label_percent()) +
+  theme(legend.position = "top") +
+  scale_fill_manual(values = c("excellent" = "#CC99FF", "standard" = "#C28E4F")) 
+
 
 ```
 
@@ -1237,16 +1246,18 @@ t.test(len ~ supp, data = ToothGrowth,
 
 ## Revising My Thinking
 
-<!-- How did you revise your thinking throughout the course? How did you revise your thinking on the code examples you have provided in your portfolio? -->
-
-<!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
+Throughout the course, I have revised my thinking through assignment revisions, practice assignments in class, and collaborations with peers. When receiving feedback, with a success grade or growing, I try to implement the changes into my assignments and submit those changes. Also, if those revisions have been still wrong, I have updated them in this portfolio as well. For example, for my example of dyplr pipeline, I revised lab 4 question 5 to implement the feedback that I didn't need to save my pipeline as a saved variable/data set if I was just outputting that table. In addition to that, I also updated my code in the practice assignments when a classmate mentioned my use of the recode function was superseded and suggested case_when() which was very helpful to revise my thinking during the collaboration process so I could implement it in my code. Overall, I tried my best to revise my code and thinking when attempting or revising my assignments so that I would have quality code at the end of the day, something I could put on my portfolio later on. I think that effort to revise allowed the code in my portfolio to be good code.
 
 ## Extending My Thinking
 
-<!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
+Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4. In this assignment, I really wanted to dive into the data a little more and use a variety of variables to see what insights and trends were in the data. To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. From this, I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis's appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio.
 
 ## Peer Support & Collaboration
 
-<!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
+When it came to peer support and collaboration, I found it was hard to do in college in certain classes. In this class, I think I improved my ability to collaborate in groups and teams on assignments and in feedbacks. In the peer reviews for assignments, I found myself giving good feedback about where they did really well and also little things they could do to make changes, In the lab 2 feedback I wrote,
 
-<!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
+"Hi! I think your lab looks great! I really liked that you included descriptive labels to all of your plots and that you have tidy code throughout your Quarto document which is great like spaces and extra lines after "+" in your code. The document looks cool, but slightly hard to read. Also your jitter plots are on top of your boxplots which make those a bit harder to see too. Overall, you did a great job on Lab 2!"
+
+While I do have a hard time giving criticism, I thought I did good on talking about what specifically was some areas to fix. While I have other code review that I thought was more detailed, I didnt have any feedback on where they could fix their code which I think is important to highlight.
+
+When it came to the weekly-pair activities and collaboration outside of class, I think I did good on sticking to the coding pair "rules" to allow the other person to explain their thoughts while I typed and then sharing my thoughts when it was mine turn to share. But, when we both got stuck, we collaborated really well to find a solution together or ask questions for some hints on where to find the solution. Outside of class, I made time in my schedule to work with peers in a study group way so that if we got stuck, we had ways to share ideas. I think this is the most I have worked outside of class (optionally) with peers which was an improvement for me. Overall, I feel I really improved on my collaboration skills and being able to give feedback to peers.
