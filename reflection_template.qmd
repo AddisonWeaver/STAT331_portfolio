@@ -548,6 +548,36 @@ ca_childcare |>
 
 ```{r}
 #| label: r-2-3
+#Lab 8 Question 3
+
+clean_label <- function(x) { #helper function for labels
+  x |>
+    str_replace_all("_", " ") |>
+    str_to_title()
+}
+
+boxplot_func <- function(df, cat_var, num_var) {
+  
+  cat_label <- clean_label(as_label(ensym(cat_var)))
+  num_label <- clean_label(as_label(ensym(num_var)))
+  
+  ggplot(df, aes(x = {{cat_var}}, y = {{num_var}}, fill = {{cat_var}})) +
+    geom_boxplot() +
+    labs(
+      title = str_c(
+        "Distribution of",
+       cat_label,
+        "by",
+        num_label
+      ),
+      x = cat_label,
+      y = num_label,
+      fill = cat_label
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none") 
+  
+}
 
 ```
 
@@ -574,6 +604,20 @@ ca_childcare |>
 
 ```{r}
 #| label: r-3-function-stops
+#Lab 8 Question 2
+pivot_table <- function(df, row, col) {
+   if (!is.data.frame(df)) {
+    stop("df must be a data frame.")
+  }
+  df |>
+    count({{row}}, {{col}}) |>
+    pivot_wider(
+      names_from = {{col}},
+      values_from = n,
+      values_fill = 0) |>
+    adorn_totals(where = c("row", "col"))
+    
+}
 
 ```
 
@@ -1027,6 +1071,25 @@ region_median_income
 
 ```{r}
 #| label: dvs-7-ex-1
+# Lab 9 Question 8
+fish |> 
+  map_int(~ sum(is.na(.x))) |> 
+  enframe(name = "Meaurement Variable", value = "Missing Values") |> 
+  arrange(`Missing Values`) |>
+  gt() |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) |>
+  tab_header(
+    title = "Number of Missing Values for Fish Measurements",
+    subtitle = "Data Collected from 1989 to 2006 on the Blackfoot Fish River in Montana"
+  ) |>
+  data_color(
+    columns = `Missing Values`,
+    color = function(x) {ifelse(x == 0,"#4E7D62", "#B45529"
+    )} 
+  )
 
 ```
 
@@ -1034,6 +1097,72 @@ region_median_income
 
 ```{r}
 #| label: dvs-7-ex-2
+
+# Lab 9 Question 6
+demographics_fancy <- evals |>
+  distinct(teacher_id, .keep_all = TRUE) |>              # keep one row per instructor
+  mutate(
+    #senior levels
+    sen_level = case_when(
+      seniority <= 4 ~ "Junior",
+      seniority <= 8 ~ "Senior",
+      seniority > 8  ~ "Very Senior"
+    ),
+    # sex levels
+    sex = fct_recode(sex,
+      "Female" = "female",
+      "Male" = "male"
+    ),
+    # degree levels
+    academic_degree = fct_recode(academic_degree,
+     "Masters" =  "ma",
+      "Doctorate" = "dr",
+      "No Degree" = "no_dgr",
+      "Tenured Professor" = "prof",
+    )
+  ) |>
+  select(academic_degree, sen_level, sex) |> 
+  rename( #renamed variables
+    "Academic Degree" = academic_degree,
+    "Seniority" = sen_level,
+    "Sex"       = sex
+  ) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "level"
+  ) |>
+  count(variable, level, name = "Count") |> 
+  group_by(variable) |>
+  mutate(
+    Percent = Count / sum(Count)) |> 
+  ungroup() |> 
+  gt(
+    groupname_col = "variable",
+    rowname_col   = "level"
+  ) |>
+  tab_header(
+    title    = "Demographics of Professors",
+    subtitle = "Student Evaluations at the University of Poland, Warsaw in 2020"
+  ) |> 
+  cols_label(
+    Count   = "Count",
+    Percent = "%"
+  ) |> 
+  tab_spanner( #googled headers for specific cols and then looked up the documentation
+    label = "Professors",
+    columns = c(Count, Percent)
+  ) |> 
+  tab_style( #used documentation + google to find this function
+    style = list(cell_fill(color = "#e0e0e0"),
+                 cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) |>
+fmt_percent( #used documentation
+  columns = Percent,
+  decimals = 2
+)
+demographics_fancy
 
 ```
 
@@ -1206,12 +1335,45 @@ ca_childcare |>
 ```{r}
 #| label: dsm-1-1
 
+#Lab 10 Question 8
+mycifun <- function(beta0, beta1, n){
+
+  #steps Q4-7
+  x <- runif(n, 0, 1)
+  ep <- rnorm(n, 0, 1)
+  y <- beta0 + beta1 * x + ep
+  
+  fit <- lm(y ~ x)
+  
+  info <- tidy(fit, conf.int = TRUE) |>
+    filter(term == "x") |>
+    mutate(
+      cover = if_else(conf.low <= beta1 & conf.high >= beta1, 1, 0)
+    )
+  
+  # keep only the 4 columns needed
+  info <- info[, c("estimate", "conf.low", "conf.high", "cover")]
+  
+  
+  return(info)
+}
+
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dsm-1-2
+
+#Lab 10 Question 1
+randomBabies <- function(n_babies){
+  random <- sample(1:n_babies)
+  sum(random == 1:n_babies)
+}
+set.seed(310)  
+results <- map_int(.x = 1:10000,
+                   .f = ~randomBabies(4)
+                  )
 
 ```
 
