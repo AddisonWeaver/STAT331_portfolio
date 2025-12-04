@@ -1199,11 +1199,14 @@ recreate_plot <- ca_childcare |>
 ```{r}
 #| label: pe-1-across
 
-#Lab 3 Question 7 Modified
-unique_instructors |>
-  summarise(across(c(academic_degree, seniority, sex),
-                   ~ list(table(.x)),
-                   .names = "{.col}_counts"))
+#Lab 8 Question 1
+rescale_column <- function(df, cols) {
+    if (!is.data.frame(df)) { #googled data frame checks
+    stop("The first argument must be a data frame.")
+  }
+   df |>
+     mutate(across({{cols}}, ~rescale_01(.x))) #tried without across first
+ }
 
 ```
 
@@ -1211,6 +1214,18 @@ unique_instructors |>
 
 ```{r}
 #| label: pe-1-map-1
+
+#Lab 9 Question 3
+surveys |> 
+  map_chr(.f = typeof) |> 
+  enframe(name = "Variable", value = "Data_Type") |> 
+  arrange(Data_Type) |> 
+  kable(
+    caption = "Types of Data Collected In One of the Longest Running Ecological Studies, Portal Project",
+    col.names = c("Variable", "Data Type")
+  ) |>
+  row_spec(0, bold = TRUE) |>
+  kable_classic(full_width = FALSE)
 
 ```
 
@@ -1221,6 +1236,18 @@ unique_instructors |>
 ```{r}
 #| label: pe-2-1
 
+#Lab 7 Question 4
+rescale_01 <- function(x) {
+   #part 5 stuff
+   stopifnot(is.numeric(x),
+             length(x) >1)
+   # here is the #4 part4
+   min <- min(x, na.rm = TRUE)
+   
+   ((x - min) / 
+     (max(x, na.rm = TRUE) - min))
+ }
+
 ```
 
 -   Example 2: Function that operates on data frames
@@ -1228,12 +1255,58 @@ unique_instructors |>
 ```{r}
 #| label: pe-2-2
 
+#Lab 8 Question 2
+pivot_table <- function(df, row, col) {
+   if (!is.data.frame(df)) {
+    stop("df must be a data frame.")
+  }
+  df |>
+    count({{row}}, {{col}}) |>
+    pivot_wider(
+      names_from = {{col}},
+      values_from = n,
+      values_fill = 0) |>
+    adorn_totals(where = c("row", "col"))
+    
+}
+
 ```
 
 -   Example 3: Function that operates on vectors *or* data frames
 
 ```{r}
 #| label: pe-2-3
+#Lab 8 Question 3
+
+clean_label <- function(x) { #helper function for labels
+  x |>
+    str_replace_all("_", " ") |>
+    str_to_title()
+}
+
+boxplot_func <- function(df, cat_var, num_var) {
+  
+  cat_label <- clean_label(as_label(ensym(cat_var)))
+  num_label <- clean_label(as_label(ensym(num_var)))
+  
+  ggplot(df, aes(x = {{cat_var}}, y = {{num_var}}, fill = {{cat_var}})) +
+    geom_boxplot() +
+    labs(
+      title = str_c(
+        "Distribution of",
+       cat_label,
+        "by",
+        num_label
+      ),
+      x = cat_label,
+      y = num_label,
+      fill = cat_label
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none") 
+  
+}
+
 
 ```
 
@@ -1256,12 +1329,28 @@ unique_instructors |>
 ```{r}
 #| label: pe-3-map-1
 
+
+# Lab 9 Question 7
+fish_missing <- fish |> # basically the same as the lab 7 question + class notes
+  map_int(.f = ~ sum(is.na(.x))) |>      
+  enframe(name = "Variable",        
+          value = "Missing Values")
+
+fish_missing
+
 ```
 
 -   using a `map()` function with **more than one** input (e.g., `map_2()` or `pmap()`)
 
 ```{r}
 #| label: pe-3-map-2
+
+#Lab 10 Question 10
+set.seed(310)
+
+ci_data <- map(.x = 1:1000,
+              .f =  ~ mycifun(beta0 = 3, beta1 = .5, n = 100)
+              )
 
 ```
 
@@ -1349,14 +1438,12 @@ mycifun <- function(beta0, beta1, n){
     filter(term == "x") |>
     mutate(
       cover = if_else(conf.low <= beta1 & conf.high >= beta1, 1, 0)
-    )
-  
-  # keep only the 4 columns needed
-  info <- info[, c("estimate", "conf.low", "conf.high", "cover")]
-  
+    )|>
+    select(c(estimate, conf.low, conf.high, cover))
   
   return(info)
 }
+
 
 ```
 
