@@ -101,12 +101,12 @@ teacher_evals_clean <- evals |>
 ```{r}
 #| label: wd-2-ex-3
 
-#Lab 4 Question 7 (starts_with() for selecting cols for pivot_longer)
+#Lab 4 Question 7 (modified select to have starts_with())
 recreate_plot <- ca_childcare |>
-  select(region, county_name, study_year, mc_infant, mc_toddler, mc_preschool) |>
+  select(region, county_name, study_year, starts_with("mc_")) |>
   filter(study_year >= 2008, study_year <= 2018) |>
   pivot_longer(
-    cols = starts_with("mc_"),
+    cols = starts_with("mc_"),  
     names_to = "age_group",
     values_to = "median_price"
   ) |>
@@ -116,7 +116,7 @@ recreate_plot <- ca_childcare |>
                                   "Preschool"= "mc_preschool"),
     age_group = fct_relevel(age_group, "Infant", "Toddler", "Preschool"),
     region = fct_reorder2(region, study_year, median_price, .desc = TRUE))
-  
+
 
 
 ```
@@ -167,15 +167,17 @@ teacher_evals_clean |>
 #| label: wd-3-character
 
 #Lab 5
-first_witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, by = c("person_id" = "id")) |>
-  filter(address_street_name == "Northwestern Dr",
-         address_number == max(address_number)) |>
+witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
+  inner_join(person, join_by = (person_id == id)) |>
+  filter((address_street_name == "Northwestern Dr"&
+         address_number == max(address_number)) |((str_detect(name, "Annabel")&
+                    address_street_name == "Franklin Ave"))) |>
   select(name, transcript) |>
-  mutate(result = str_c(name, ": ", transcript)) |>
-  pull(result) # found the interview with the person who was a witness (two witnesses)
+    mutate(output = str_c(name, ": ", transcript)) |>
+  pull(output)
+
   
-first_witness_interview
+witness_interview
 
 ```
 
@@ -185,15 +187,20 @@ first_witness_interview
 #| label: wd-3-string
 
 #Lab 5
-second_witness_interview <- interview |>
-  inner_join(person, by = c("person_id" = "id"))|>
-  filter(str_detect(name, "Annabel"),
-                    address_street_name == "Franklin Ave")|>
-  select(name, transcript) |>
-  mutate(result = str_c(name, ": ", transcript)) |>
-  pull(result) #found 2nd witness's interview and read its description
+suspects <- get_fit_now_member |>
+  rename(member_id = id, member_name = name) |>
+  inner_join(get_fit_now_check_in, join_by(member_id == membership_id)) |>
+  inner_join(person, join_by(person_id == id)) |>
+  inner_join(drivers_license, join_by(license_id == id)) |> #had to get all the speific data to filter through all the data tables
+  filter(
+    membership_status == "gold",
+    str_starts(member_id, "48Z"),
+    check_in_date == "20180109",
+    str_detect(plate_number, "H42W")
+  ) |>
+ select(member_name) #searched for suspects using both of the witnesses testimony with filter
 
-second_witness_interview
+print(suspects)
   
 
 ```
@@ -204,19 +211,18 @@ second_witness_interview
 #| label: wd-3-date 
 
 #Lab 5 Modified to include lubridate functions
-
 who_hired <- person |>
-  inner_join(drivers_license, by = c("license_id" = "id")) |>
-  inner_join(facebook_event_checkin, by = c("id" = "person_id")) |> #based on jeremy's testimony, searched for the hirer.
-  mutate(date = ymd(date))|>
+  inner_join(drivers_license, join_by = (license_id = id)) |>
+  inner_join(facebook_event_checkin, join_by = (id = person_id)) |> #based on jeremy's testimony, searched for the hirer.
   filter(
     hair_color == "red",
     gender == "female",
     car_make == "Tesla",
     car_model == "Model S",
-    event_name == "SQL Symphony Concert",
-    year(date) == 2018, month(date) == 12
-  )
+    event_name == "SQL Symphony Concert"
+  ) |>
+  count(name) |>
+  filter(n == 3)
 who_hired
 ```
 
@@ -310,15 +316,17 @@ recreate_plot <- ca_childcare |>
 ```{r}
 #| label: wd-4-string
  # Lab 5
-second_witness_interview <- interview |>
-  inner_join(person, by = c("person_id" = "id"))|>
-  filter(str_detect(name, "Annabel"),
-                    address_street_name == "Franklin Ave")|>
+witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
+  inner_join(person, join_by = (person_id == id)) |>
+  filter((address_street_name == "Northwestern Dr"&
+         address_number == max(address_number)) |((str_detect(name, "Annabel")&
+                    address_street_name == "Franklin Ave"))) |>
   select(name, transcript) |>
-  mutate(result = str_c(name, ": ", transcript)) |>
-  pull(result) #found 2nd witness's interview and read its description
+    mutate(output = str_c(name, ": ", transcript)) |>
+  pull(output)
 
-second_witness_interview
+  
+witness_interview
   
 ```
 
@@ -330,7 +338,7 @@ second_witness_interview
 #Lab 5 Modified to include lubridate functions
 
 who_hired <- person |>
-  inner_join(drivers_license, by = c("license_id" = "id")) |>
+  inner_join(drivers_license, join_by = (license_id = id)) |>
   inner_join(facebook_event_checkin, by = c("id" = "person_id")) |> #based on jeremy's testimony, searched for the hirer.
   mutate(date = ymd(date))|>
   filter(
@@ -386,15 +394,17 @@ ca_childcare <- childcare_costs |>
 #| label: wd-5-inner-ex-1
 
 #Lab 5
-first_witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, by = c("person_id" = "id")) |>
-  filter(address_street_name == "Northwestern Dr",
-         address_number == max(address_number)) |>
+witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
+  inner_join(person, join_by = (person_id == id)) |>
+  filter((address_street_name == "Northwestern Dr"&
+         address_number == max(address_number)) |((str_detect(name, "Annabel")&
+                    address_street_name == "Franklin Ave"))) |>
   select(name, transcript) |>
-  mutate(result = str_c(name, ": ", transcript)) |>
-  pull(result) # found the interview with the person who was a witness (two witnesses)
+    mutate(output = str_c(name, ": ", transcript)) |>
+  pull(output)
+
   
-first_witness_interview
+witness_interview
 ```
 
 -   `inner_join()` Example 2
@@ -424,14 +434,15 @@ suspects
 
 ```{r}
 #| label: wd-6-semi
-#Using Lab 5 data, Made Some Code for Semi-join for filtering for gym members who checked in on a specific date
 
-get_fit_now_member |>
-  semi_join(
-    get_fit_now_check_in |> filter(check_in_date == "20180109"),
-    by = c("id" = "membership_id")
-  )
+#Lab 5
+suspect_interview <- interview |>
+  inner_join(person, join_by = (person_id = id)) |>
+  semi_join(suspects, join_by = (name = member_name)) |>
+  mutate(result = str_c(name, ": ", transcript)) |>
+  pull(result) #found the interview of main suspect
 
+suspect_interview
 
 ```
 
@@ -440,13 +451,29 @@ get_fit_now_member |>
 ```{r}
 #| label: wd-6-anti
 
-#Lab 5 datasets to write code for anti-join to filter out people who didn't attend the SQL Symphony concert
+#Lab 5 Finding Suspects modified to write code for anti-join to filter out people who aren't suspects
 
-person |>
-  anti_join(
-    facebook_event_checkin |> filter(event_name == "SQL Symphony Concert"),
-    by = c("id" = "person_id")
+
+not_suspects <- get_fit_now_member |>
+  rename(member_id = id) |>
+  filter(
+    membership_status != "gold" |
+    !str_starts(member_id, "48Z")
   )
+
+suspects <- get_fit_now_member |>
+  rename(member_id = id, member_name = name) |>
+  inner_join(get_fit_now_check_in, join_by(member_id == membership_id)) |>
+  inner_join(person, join_by(person_id == id)) |>
+  inner_join(drivers_license, join_by(license_id == id)) |>
+  anti_join(not_suspects, join_by(member_id == member_id)) |>
+  filter(
+    check_in_date == "20180109",
+    str_detect(plate_number, "H42W")
+  ) |>
+  select(member_name)
+
+print(suspects)
 
 ```
 
@@ -514,15 +541,19 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-2-1 
 
-# Lab 2 Q8 - Q16
+# Challenge 2 based on Lab 2 Q8 - Q16 Boxplots
 
 ggplot(data = surveys,
   mapping = aes(x=weight, y= species)) +
   geom_jitter(color = "steelblue", alpha = 0.3) +
   geom_boxplot(outliers = FALSE) +
-  labs(x= "Weight(g)", y= "Species", title = "The Relationship between Rodent Species and Weight") +
-  theme( plot.title = element_text(size = 18),axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16), panel.grid.minor = element_blank())
-
+  labs(x = "Weight(g)",
+       y = "Species",
+       title = "The Relationship between Rodent Species and Weight") +
+  theme(plot.title = element_text(size = 18),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        panel.grid.minor = element_blank())
 ```
 
 -   Example of **dplyr** pipeline
@@ -597,6 +628,17 @@ ca_childcare |>
   arrange(desc(`2018`)) |>
   rename(Median_Income_2008 = `2008`,
          Median_Income_2018 = `2018`)
+ # Lab 7 Question 4
+ rescale_01 <- function(x) {
+   #part 5 stuff
+   stopifnot(is.numeric(x),
+             length(x) >1)
+   # here is the #4 part4
+   min <- min(x, na.rm = TRUE)
+   
+   ((x - min) / 
+     (max(x, na.rm = TRUE) - min))
+ }
 
 ```
 
@@ -672,6 +714,25 @@ labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \n
 ```{r}
 #| label: dvs-2-cat
 
+#Challenge 3 Question 2
+ggplot(data = teacher_evals_compare, aes(x = sen_level, fill = set_level)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Evaluation of Teachers' Use Of Actvities",
+    x = "Years of Experience",
+    y = NULL,
+    fill = "Evaluation Rating") +
+  scale_y_continuous(labels = scales::percent) +
+  theme(legend.position = "top") +
+  scale_fill_manual(values = c("excellent" = "#CC99FF", "standard" = "#C28E4F")) 
+
+```
+
+-   Dates (time series plot)
+
+```{r}
+#| label: dvs-2-date
+
 #lab 4 Question 7
 
 recreate_plot <- ca_childcare |>
@@ -708,13 +769,6 @@ ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
 
 ```
 
--   Dates (time series plot)
-
-```{r}
-#| label: dvs-2-date
-
-```
-
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
 
 -   I can modify my plot theme to be more readable
@@ -745,12 +799,11 @@ ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
 ```{r}
 #| label: dvs-2-ex-2
 
-#Lab 4 Question 7
-colors_plot <- colorRampPalette(brewer.pal(7, "Accent"))(10)
+#Lab 4 Question 7 (modifed for viridis color blind friendly colors )
 ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
   geom_point(alpha = 0.4) +
   geom_smooth() +
-  scale_color_manual(values = colors_plot) +
+  scale_color_viridis_d(option = "D") +
   scale_x_continuous(breaks = seq(2008, 2018, by = 2)) + ## I googles how to increment by 2 years using scale_x_continuous
   scale_y_continuous(breaks = seq(0, 500, by = 100)) +
   facet_wrap(~ age_group, axes = "all_x") + # found some cool things in the facet_wrap documentation
@@ -882,15 +935,15 @@ ggplot(recreate_plot, aes(x = study_year, y = median_price, color = region)) +
 
 ```{r}
 #| label: dvs-3-1-ex-2
+#Lab 8 Question 4
+my_plot <- ggplot(penguins, mapping = aes(x = species, fill = sex)) + 
+  geom_bar()
 
-#Challenge 2
+style_plot(my_plot, 
+           theme_fn = theme_bw, 
+           palette = brewer.pal(3, "Paired"), 
+           aesthetic = "fill")
 
-ggplot(data = surveys,
-  mapping = aes(x=weight, y= species)) +
-  geom_jitter(color = "steelblue", alpha = 0.3) +
-  geom_boxplot(outliers = FALSE) +
-  labs(x= "Weight(g)", y= "Species", title = "The Relationship between Rodent Species and Weight") +
-  theme( plot.title = element_text(size = 14),axis.title.x = element_text(size = 12), axis.title.y = element_text(size = 12), panel.grid.minor = element_blank())
 
 ```
 
@@ -922,6 +975,41 @@ labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \n
 
 ```{r}
 #| label: dvs-3-3
+#Lab 7 Question 3
+fish |>
+  group_by(year, section, trip) |>
+  summarise(across(everything(), ~ sum(is.na(.x))), .groups = "drop") |>
+  pivot_longer(
+    cols = -c(year, section, trip),
+    names_to = "Variable",
+    values_to = "missing_count"
+  ) |>
+  mutate(trip = recode(
+    trip,
+    "1" = "First Survey (Trip 1)",
+    "2" = "Second Survey (Trip 2)"
+  )) |>
+  filter(missing_count > 0) |>
+  ggplot(aes(x = year, y = missing_count, color = section)) +
+  geom_segment(
+    aes(xend = year, y = 0, yend = missing_count),
+    linewidth = 1
+  ) +
+  geom_point(size = 3) +
+  facet_wrap(~ as.factor(trip)) +
+  labs(
+    title = "The First Survey Had More Missing Values of Trout Weight Than The Second Over Two Decades",
+    x = "Year",
+    y= "Number of Missing Weight Observations",
+    subtitle = "Ecologists Surveyed at Blackfoot River in Helena, Montana to Investigate Trout Species Populations",
+    fill = "Section"
+  ) +
+  scale_color_manual(values = c("Johnsrud" = "#56B4E9", "ScottyBrown" = "#E69F00")) +
+  theme(plot.title = element_text(size = 8, face = "bold"),
+        plot.subtitle = element_text(size = 6),
+        axis.title = element_text(size = 8),
+        strip.text = element_text(size = 6))
+
 
 ```
 
@@ -932,16 +1020,11 @@ labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \n
 ```{r}
 #| label: dvs-4-summarize
 
-#Lab 3 Question 11
-teacher_evals_clean |>
-  filter(seniority == 1) |>
-  group_by(teacher_id) |>
-  summarise(avgfail = mean(percent_failed_cur),.groups = "drop") |>
-  mutate(maxmin = case_when(
-    avgfail == max(avgfail) ~ "Highest",
-    avgfail == min(avgfail) ~ "Lowest"
-  )) |>
-  filter(!is.na(maxmin))
+#Lab 3 Question 9
+teacher_evals_clean |> 
+  group_by(teacher_id, course_id) |>
+  summarise(questions_num = n_distinct(question_no)) |>
+  filter(questions_num == 9)
 ```
 
 -   Example using `across()`
@@ -1042,6 +1125,72 @@ print(summary_table, n = Inf, width = Inf)
 
 ```{r}
 #| label: dvs-6-ex-2
+#Lab 9 Question 6
+
+demographics_fancy <- evals |>
+  distinct(teacher_id, .keep_all = TRUE) |>              # keep one row per instructor
+  mutate(
+    #senior levels
+    sen_level = case_when(
+      seniority <= 4 ~ "Junior",
+      seniority <= 8 ~ "Senior",
+      seniority > 8  ~ "Very Senior"
+    ),
+    # sex levels
+    sex = fct_recode(sex,
+      "Female" = "female",
+      "Male" = "male"
+    ),
+    # degree levels
+    academic_degree = fct_recode(academic_degree,
+     "Masters" =  "ma",
+      "Doctorate" = "dr",
+      "No Degree" = "no_dgr",
+      "Tenured Professor" = "prof",
+    )
+  ) |>
+  select(academic_degree, sen_level, sex) |> 
+  rename( #renamed variables
+    "Academic Degree" = academic_degree,
+    "Seniority" = sen_level,
+    "Sex"       = sex
+  ) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "level"
+  ) |>
+  count(variable, level, name = "Count") |> 
+  group_by(variable) |>
+  mutate(
+    Percent = Count / sum(Count)) |> 
+  ungroup() |> 
+  gt(
+    groupname_col = "variable",
+    rowname_col   = "level"
+  ) |>
+  tab_header(
+    title    = "Demographics of Professors",
+    subtitle = "Student Evaluations at the University of Poland, Warsaw in 2020"
+  ) |> 
+  cols_label(
+    Count   = "Count",
+    Percent = "%"
+  ) |> 
+  tab_spanner( #googled headers for specific cols and then looked up the documentation
+    label = "Professors",
+    columns = c(Count, Percent)
+  ) |> 
+  tab_style( #used documentation + google to find this function
+    style = list(cell_fill(color = "#e0e0e0"),
+                 cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) |>
+fmt_percent( #used documentation
+  columns = Percent,
+  decimals = 2
+)
+demographics_fancy
 
 ```
 
@@ -1471,7 +1620,7 @@ results <- map_int(.x = 1:10000,
 ```{r}
 #| label: dsm-2-1
 
-#Lab 2 Q17
+#Lab 2 Question 17
 
 summary(aov(weight ~ species, data = surveys))
 
@@ -1481,7 +1630,7 @@ summary(aov(weight ~ species, data = surveys))
 
 ```{r}
 #| label: dsm-2-2
-# Challenge 3 Q3
+# Challenge 3 Question 3
 chisq.test(teacher_evals_compare$set_level, teacher_evals_compare$sen_level)
 ```
 
@@ -1501,15 +1650,15 @@ t.test(len ~ supp, data = ToothGrowth,
 
 ## Revising My Thinking
 
-Throughout the course, I have revised my thinking through assignment revisions, practice assignments in class, and collaborations with peers. When receiving feedback, with a success grade or growing, I implement the changes into my all of those assignments and submit those changes with reflections. Not only that, but implement the changes in future assignments. Also, if those revisions have been still wrong, I have updated them in this portfolio as well. For example, for my example of dyplr pipeline, I revised lab 4 question 5 to implement the feedback that I didn't need to save my pipeline as a saved variable/data set if I was just outputting that table. In addition to that, I also updated my code in the practice assignments when a classmate mentioned my use of the recode function was superseded and suggested case_when() which was very helpful to revise my thinking during the collaboration process so I could implement it in my code. Overall, I tried my best to revise my code and thinking when attempting or revising my assignments so that I would have quality code at the end of the day, something I could put on my portfolio later on. I think that effort to revise allowed the code in my portfolio to be good code.
+Throughout the course, I have revised my thinking through assignment revisions, practice assignments in class, and collaborations with peers. When receiving feedback, with a success grade or growing, I implement the changes into my all of those assignments and submit those changes with reflections even if I got a score of success, I implement any feedback. Not only that, but implement the changes in future assignments. Also, if those revisions have been still wrong, I have updated them in this portfolio as well. For example, for my example of dyplr pipeline, I revised lab 4 question 5 to implement the feedback that I didn't need to save my pipeline as a saved variable/data set if I was just outputting that table. In addition to that, I also updated my code in the practice assignments when a classmate mentioned my use of the recode function was superseded and suggested case_when() which was very helpful to revise my thinking during the collaboration process so I could implement it in my code. Overall, I tried my best to revise my code and thinking when attempting or revising my assignments so that I would have quality code at the end of the day, something I could put on my portfolio later on. I think that effort to revise allowed the code in my portfolio to be good code and helped me learn a lot throughout the quarter.
 
 ## Extending My Thinking
 
-Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4. In this assignment, I really wanted to dive into the data a little more and use a variety of variables to see what insights and trends were in the data. To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. From this, I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis's appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio.
+Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4. In this assignment, I really wanted to dive into the data a little more and use a variety of variables to see what insights and trends were in the data. To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. From this, I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis's appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio.I also learned how to make a new plot using geom_segment() which I included in this portfolio. Overall, I feel like I pushed myself to learn more than just what the quarter's assignments have been looking for. 
 
 ## Peer Support & Collaboration
 
-When it came to peer support and collaboration, I found it was hard to do in college in certain classes. In this class, I think I improved my ability to collaborate in groups and teams on assignments and in feedback. In the peer reviews for assignments, I found myself giving good feedback about where they did really well and also little things they could do to make changes, In the lab 2 feedback I wrote,
+When it came to peer support and collaboration, I found it was hard to do in college in certain classes. In this class, I think I improved my ability to collaborate in groups and teams on assignments and in feedback. In the peer reviews for assignments each week, I found myself giving good feedback about where they did really well and also little things they could do to make changes, In the lab 2 feedback I wrote,
 
 "Hi! I think your lab looks great! I really liked that you included descriptive labels to all of your plots and that you have tidy code throughout your Quarto document which is great like spaces and extra lines after "+" in your code. The document looks cool, but slightly hard to read. Also your jitter plots are on top of your boxplots which make those a bit harder to see too. Overall, you did a great job on Lab 2!"
 
