@@ -8,10 +8,20 @@ editor: visual
 
 1.  Finish the sentence with another student’s name: "If \[Name of Student\] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
 
+    If Scarlet Kwan doesn't earn an A then nobody should because she did all of her assignments, revisions, and peer reviews while also being a great collaborator/friend when I was having trouble on code outside of class where we could chat about the assignment together to find a solution through a tough spot.
+
 2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
+
+    I think the most difficult part of the class for me was the data join topic because wrapping my head around adding two data frames through a key was a bit of a learning curve. One example that was difficult for me was using semi-join to filter my code as I wanted to understand first how it worked visually, then trying to find the syntax for it to work as I wanted, but through this process, I learned a lot about joins that went further than some of the notes.
 
 3.  What was the easiest part of the class for you? Explain why.
 
+    I think the easiest part of the class was learning the syntax of R for visualization since it seems very self explanatory for me after learning other languages like python and java as it avoided any weird symbols or syntax to learn in my opinion.
+
 4.  What part of the class surprised or interested you the most? Explain why.
 
+    I think the part about the class that interested me the most was me actually enjoying doing the assignments each week cause I was expecting to just be "getting through" the assignments. I was very excited to learn more about R as it wasn't too difficult but was extremely rewarding getting the code to do what I wanted or creating the plots I wanted when working on it or getting through errors.
+
 5.  Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+    A piece of advice I'd give to a student next quarter would be to not use chatgpt at all. It really isn't necessary and I used it early on to help me with functions or syntax I couldn't remember or to solve errors that R was throwing, but in the end, reading documentation of code helped me more to learn more things about R and find new creative things to do for my assignments.
