@@ -2202,7 +2202,7 @@ vertical-align: -.125em;
 </header>
 
 
-<p><u><strong>My Grade:</strong></u> I believe my grade equivalent to course work evidenced below to be an B+.</p>
+<p><u><strong>My Grade:</strong></u> I believe my grade equivalent to course work evidenced below to be an A.</p>
 <p><u><strong>Learning Objective Evidence:</strong></u> In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify <strong>where</strong> the code came from (e.g., Lab 4 Question 2).</p>
 <section id="working-with-data" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-data">Working with Data</h2>
@@ -2326,9 +2326,9 @@ vertical-align: -.125em;
 <li>Character Example 1 (any context)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 (modified for join_by changes to all of lab 5)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>witness_interview <span class="ot">&lt;-</span> interview <span class="sc">|&gt;</span> <span class="co"># from this we got the persons name, address, id, etc as well as interview transcript</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="at">join_by =</span> (person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="fu">join_by</span>(person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>((address_street_name <span class="sc">==</span> <span class="st">&quot;Northwestern Dr&quot;</span><span class="sc">&amp;</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>         address_number <span class="sc">==</span> <span class="fu">max</span>(address_number)) <span class="sc">|</span>((<span class="fu">str_detect</span>(name, <span class="st">&quot;Annabel&quot;</span>)<span class="sc">&amp;</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                    address_street_name <span class="sc">==</span> <span class="st">&quot;Franklin Ave&quot;</span>))) <span class="sc">|&gt;</span></span>
@@ -2343,7 +2343,7 @@ vertical-align: -.125em;
 <li>Character Example 2 (example must use functions from <strong>stringr</strong>)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 (modified for join_by changes to all of lab 5)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> get_fit_now_member <span class="sc">|&gt;</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">member_id =</span> id, <span class="at">member_name =</span> name) <span class="sc">|&gt;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(get_fit_now_check_in, <span class="fu">join_by</span>(member_id <span class="sc">==</span> membership_id)) <span class="sc">|&gt;</span></span>
@@ -2363,20 +2363,24 @@ vertical-align: -.125em;
 <li>Date (example must use functions from <strong>lubridate</strong>)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Modified to include lubridate functions</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Modified to include lubridate functions + join_by</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>who_hired <span class="ot">&lt;-</span> person <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="at">join_by =</span> (<span class="at">license_id =</span> id)) <span class="sc">|&gt;</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(facebook_event_checkin, <span class="at">join_by =</span> (<span class="at">id =</span> person_id)) <span class="sc">|&gt;</span> <span class="co">#based on jeremy&#39;s testimony, searched for the hirer.</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    hair_color <span class="sc">==</span> <span class="st">&quot;red&quot;</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="st">&quot;female&quot;</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    car_make <span class="sc">==</span> <span class="st">&quot;Tesla&quot;</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    car_model <span class="sc">==</span> <span class="st">&quot;Model S&quot;</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    event_name <span class="sc">==</span> <span class="st">&quot;SQL Symphony Concert&quot;</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">3</span>)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>who_hired</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="fu">join_by</span>(license_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(facebook_event_checkin, <span class="fu">join_by</span>(id <span class="sc">==</span> person_id)) <span class="sc">|&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">ymd</span>(date)) <span class="sc">|&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    hair_color <span class="sc">==</span> <span class="st">&quot;red&quot;</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="st">&quot;female&quot;</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    car_make <span class="sc">==</span> <span class="st">&quot;Tesla&quot;</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    car_model <span class="sc">==</span> <span class="st">&quot;Model S&quot;</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    event_name <span class="sc">==</span> <span class="st">&quot;SQL Symphony Concert&quot;</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">year</span>(date) <span class="sc">==</span> <span class="dv">2017</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">month</span>(date) <span class="sc">==</span> <span class="dv">12</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">3</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>who_hired</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>WD-4: I can modify existing variables and create new variables in a dataframe for a <em>variety</em> of data types (e.g., numeric, integer, character, factor, date).</strong></p>
 <ul>
@@ -2456,9 +2460,9 @@ vertical-align: -.125em;
 <li>Character (example must use functions from <strong>stringr</strong>)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Lab 5 (modified for join_by changes to all of lab 5)</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>witness_interview <span class="ot">&lt;-</span> interview <span class="sc">|&gt;</span> <span class="co"># from this we got the persons name, address, id, etc as well as interview transcript</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="at">join_by =</span> (person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="fu">join_by</span>(person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>((address_street_name <span class="sc">==</span> <span class="st">&quot;Northwestern Dr&quot;</span><span class="sc">&amp;</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>         address_number <span class="sc">==</span> <span class="fu">max</span>(address_number)) <span class="sc">|</span>((<span class="fu">str_detect</span>(name, <span class="st">&quot;Annabel&quot;</span>)<span class="sc">&amp;</span></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                    address_street_name <span class="sc">==</span> <span class="st">&quot;Franklin Ave&quot;</span>))) <span class="sc">|&gt;</span></span>
@@ -2473,55 +2477,59 @@ vertical-align: -.125em;
 <li>Date (example must use functions from <strong>lubridate</strong>)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Modified to include lubridate functions</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Modified to include lubridate functions + join_by()</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>who_hired <span class="ot">&lt;-</span> person <span class="sc">|&gt;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="at">join_by =</span> (<span class="at">license_id =</span> id)) <span class="sc">|&gt;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(facebook_event_checkin, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span> <span class="ot">=</span> <span class="st">&quot;person_id&quot;</span>)) <span class="sc">|&gt;</span> <span class="co">#based on jeremy&#39;s testimony, searched for the hirer.</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">ymd</span>(date))<span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="fu">join_by</span>(license_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(facebook_event_checkin, <span class="fu">join_by</span>(id <span class="sc">==</span> person_id)) <span class="sc">|&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">ymd</span>(date)) <span class="sc">|&gt;</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    hair_color <span class="sc">==</span> <span class="st">&quot;red&quot;</span>,</span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="st">&quot;female&quot;</span>,</span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    car_make <span class="sc">==</span> <span class="st">&quot;Tesla&quot;</span>,</span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    car_model <span class="sc">==</span> <span class="st">&quot;Model S&quot;</span>,</span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    event_name <span class="sc">==</span> <span class="st">&quot;SQL Symphony Concert&quot;</span>,</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">year</span>(date) <span class="sc">==</span> <span class="dv">2018</span>, <span class="fu">month</span>(date) <span class="sc">==</span> <span class="dv">12</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>who_hired</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">year</span>(date) <span class="sc">==</span> <span class="dv">2017</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">month</span>(date) <span class="sc">==</span> <span class="dv">12</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">3</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>who_hired</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>WD-5: I can use mutating joins to combine multiple dataframes.</strong></p>
 <ul>
 <li><code>left_join()</code> Example 1</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 3 Question 3</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 4 Question 3 Modified with join_by</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> ca_childcare <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(tax_rev, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;county_name&quot;</span> <span class="ot">=</span> <span class="st">&quot;entity_name&quot;</span>, <span class="st">&quot;study_year&quot;</span> <span class="ot">=</span> <span class="st">&quot;year&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(tax_rev, <span class="fu">join_by</span>(county_name <span class="sc">==</span> entity_name, study_year <span class="sc">==</span> year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li><code>right_join()</code> Example 1</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 3 Question 3 Modified for a right join</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 4 Question 3 Modified for a right join * with join_by</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> tax_rev <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ca_childcare, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;entity_name&quot;</span> <span class="ot">=</span> <span class="st">&quot;county_name&quot;</span>, <span class="st">&quot;year&quot;</span> <span class="ot">=</span> <span class="st">&quot;study_year&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ca_childcare, <span class="fu">join_by</span>(entity_name <span class="sc">==</span> county_name, year <span class="sc">==</span> study_year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li><code>left_join()</code> <strong>or</strong> <code>right_join()</code> Example 2</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 4 Question 2</span></span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 4 Question 2 modifed with join_by</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> childcare_costs <span class="sc">|&gt;</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(counties, <span class="at">by =</span> <span class="st">&quot;county_fips_code&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(counties, <span class="fu">join_by</span>(county_fips_code)) <span class="sc">|&gt;</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state_name <span class="sc">==</span> <span class="st">&quot;California&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li><code>inner_join()</code> Example 1</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 (modified for join_by changes to all of lab 5)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>witness_interview <span class="ot">&lt;-</span> interview <span class="sc">|&gt;</span> <span class="co"># from this we got the persons name, address, id, etc as well as interview transcript</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="at">join_by =</span> (person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="fu">join_by</span>(person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>((address_street_name <span class="sc">==</span> <span class="st">&quot;Northwestern Dr&quot;</span><span class="sc">&amp;</span></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>         address_number <span class="sc">==</span> <span class="fu">max</span>(address_number)) <span class="sc">|</span>((<span class="fu">str_detect</span>(name, <span class="st">&quot;Annabel&quot;</span>)<span class="sc">&amp;</span></span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                    address_street_name <span class="sc">==</span> <span class="st">&quot;Franklin Ave&quot;</span>))) <span class="sc">|&gt;</span></span>
@@ -2536,12 +2544,12 @@ vertical-align: -.125em;
 <li><code>inner_join()</code> Example 2</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Modified for join_by</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> get_fit_now_member <span class="sc">|&gt;</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">member_id =</span> id, <span class="at">member_name =</span> name) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(get_fit_now_check_in, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;member_id&quot;</span> <span class="ot">=</span> <span class="st">&quot;membership_id&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;person_id&quot;</span> <span class="ot">=</span> <span class="st">&quot;id&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;license_id&quot;</span> <span class="ot">=</span> <span class="st">&quot;id&quot;</span>)) <span class="sc">|&gt;</span> <span class="co">#had to get all the speific data to filter through all the data tables</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(get_fit_now_check_in, <span class="fu">join_by</span>(member_id <span class="sc">==</span> membership_id)) <span class="sc">|&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="fu">join_by</span>(person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(drivers_license, <span class="fu">join_by</span>(license_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span> <span class="co">#had to get all the speific data to filter through all the data tables</span></span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    membership_status <span class="sc">==</span> <span class="st">&quot;gold&quot;</span>,</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_starts</span>(member_id, <span class="st">&quot;48Z&quot;</span>),</span>
@@ -2556,10 +2564,10 @@ vertical-align: -.125em;
 <li><code>semi_join()</code></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5</span></span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 (modified to use join_by)</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>suspect_interview <span class="ot">&lt;-</span> interview <span class="sc">|&gt;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="at">join_by =</span> (<span class="at">person_id =</span> id)) <span class="sc">|&gt;</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(suspects, <span class="at">join_by =</span> (<span class="at">name =</span> member_name)) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(person, <span class="fu">join_by</span>(person_id <span class="sc">==</span> id)) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(suspects, <span class="fu">join_by</span>(name <span class="sc">==</span> member_name)) <span class="sc">|&gt;</span></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">str_c</span>(name, <span class="st">&quot;: &quot;</span>, transcript)) <span class="sc">|&gt;</span></span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(result) <span class="co">#found the interview of main suspect</span></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
@@ -2569,7 +2577,7 @@ vertical-align: -.125em;
 <li><code>anti_join()</code></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Finding Suspects modified to write code for anti-join to filter out people who aren&#39;t suspects</span></span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 5 Finding Suspects modified to write code for anti-join + join_by to filter out people who aren&#39;t suspects</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>not_suspects <span class="ot">&lt;-</span> get_fit_now_member <span class="sc">|&gt;</span></span>
@@ -2636,11 +2644,18 @@ vertical-align: -.125em;
 <p><strong>R-1: I can create professional looking, reproducible analyses using RStudio projects, Quarto documents, and the here package.</strong></p>
 <p>The following assignments satisfy the above criteria:</p>
 <ul>
+<li>Lab 1</li>
 <li>Lab 2</li>
-<li>lab 3</li>
+<li>Lab 3</li>
+<li>Challenge 3</li>
 <li>Lab 4</li>
 <li>Lab 5</li>
 <li>Challenge 4</li>
+<li>Lab 7</li>
+<li>Challenge 7</li>
+<li>Lab 8</li>
+<li>Lab 9</li>
+<li>Lab 10</li>
 </ul>
 <p><strong>R-2: I can write well documented and tidy code.</strong></p>
 <ul>
@@ -3029,7 +3044,7 @@ vertical-align: -.125em;
 <li>I can choose creative geometries (e.g., <code>geom_segment()</code>, <code>geom_ribbon)()</code>)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 7 Question 3</span></span>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lab 7 Question 3 Modified for geom_segment()</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>fish <span class="sc">|&gt;</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, section, trip) <span class="sc">|&gt;</span></span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(.x))), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">|&gt;</span></span>
@@ -3626,13 +3641,12 @@ vertical-align: -.125em;
 </section>
 <section id="extending-my-thinking" class="level2">
 <h2 class="anchored" data-anchor-id="extending-my-thinking">Extending My Thinking</h2>
-<p>Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4. In this assignment, I really wanted to dive into the data a little more and use a variety of variables to see what insights and trends were in the data. To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. From this, I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis’s appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio.I also learned how to make a new plot using geom_segment() which I included in this portfolio. Overall, I feel like I pushed myself to learn more than just what the quarter’s assignments have been looking for.</p>
+<p>Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4.To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis’s appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio. Overall, I feel like I pushed myself to learn more than just what the quarter’s assignments have been looking for.</p>
 </section>
 <section id="peer-support-collaboration" class="level2">
 <h2 class="anchored" data-anchor-id="peer-support-collaboration">Peer Support &amp; Collaboration</h2>
 <p>When it came to peer support and collaboration, I found it was hard to do in college in certain classes. In this class, I think I improved my ability to collaborate in groups and teams on assignments and in feedback. In the peer reviews for assignments each week, I found myself giving good feedback about where they did really well and also little things they could do to make changes, In the lab 2 feedback I wrote,</p>
 <p>“Hi! I think your lab looks great! I really liked that you included descriptive labels to all of your plots and that you have tidy code throughout your Quarto document which is great like spaces and extra lines after”+” in your code. The document looks cool, but slightly hard to read. Also your jitter plots are on top of your boxplots which make those a bit harder to see too. Overall, you did a great job on Lab 2!”</p>
-<p>While I do have a hard time giving criticism, I thought I did good on talking about what specifically was some areas to fix. While I have other code review that I thought was more detailed, I didn’t have any feedback on where they could fix their code which I think is important to highlight.</p>
 <p>When it came to the weekly-pair activities and collaboration outside of class, I think I did good on sticking to the coding pair protocol to allow the other person to explain their thoughts while I typed and then sharing my thoughts when it was mine turn to share. But, when we both got stuck, we collaborated really well to find a solution together or ask questions for some hints on where to find the solution. Outside of class, I made time in my schedule to work with peers in a study group way so that if we got stuck, we had ways to share ideas. I think this is the most I have worked outside of class (optionally) with peers which was an improvement for me. Overall, I feel I really improved on my collaboration skills and being able to give feedback to peers.</p>
 </section>
 

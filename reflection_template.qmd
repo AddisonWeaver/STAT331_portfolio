@@ -10,7 +10,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an B+.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an A.
 
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
@@ -166,9 +166,9 @@ teacher_evals_clean |>
 ```{r}
 #| label: wd-3-character
 
-#Lab 5
+#Lab 5 (modified for join_by changes to all of lab 5)
 witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, join_by = (person_id == id)) |>
+  inner_join(person, join_by(person_id == id)) |>
   filter((address_street_name == "Northwestern Dr"&
          address_number == max(address_number)) |((str_detect(name, "Annabel")&
                     address_street_name == "Franklin Ave"))) |>
@@ -186,7 +186,7 @@ witness_interview
 ```{r}
 #| label: wd-3-string
 
-#Lab 5
+#Lab 5 (modified for join_by changes to all of lab 5)
 suspects <- get_fit_now_member |>
   rename(member_id = id, member_name = name) |>
   inner_join(get_fit_now_check_in, join_by(member_id == membership_id)) |>
@@ -210,19 +210,23 @@ print(suspects)
 ```{r}
 #| label: wd-3-date 
 
-#Lab 5 Modified to include lubridate functions
+#Lab 5 Modified to include lubridate functions + join_by
 who_hired <- person |>
-  inner_join(drivers_license, join_by = (license_id = id)) |>
-  inner_join(facebook_event_checkin, join_by = (id = person_id)) |> #based on jeremy's testimony, searched for the hirer.
+  inner_join(drivers_license, join_by(license_id == id)) |>
+  inner_join(facebook_event_checkin, join_by(id == person_id)) |>
+  mutate(date = ymd(date)) |>
   filter(
     hair_color == "red",
     gender == "female",
     car_make == "Tesla",
     car_model == "Model S",
-    event_name == "SQL Symphony Concert"
+    event_name == "SQL Symphony Concert",
+    year(date) == 2017,
+    month(date) == 12
   ) |>
   count(name) |>
   filter(n == 3)
+
 who_hired
 ```
 
@@ -315,9 +319,9 @@ recreate_plot <- ca_childcare |>
 
 ```{r}
 #| label: wd-4-string
- # Lab 5
+ # Lab 5 (modified for join_by changes to all of lab 5)
 witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, join_by = (person_id == id)) |>
+  inner_join(person, join_by(person_id == id)) |>
   filter((address_street_name == "Northwestern Dr"&
          address_number == max(address_number)) |((str_detect(name, "Annabel")&
                     address_street_name == "Franklin Ave"))) |>
@@ -335,20 +339,24 @@ witness_interview
 ```{r}
 #| label: wd-4-date
 
-#Lab 5 Modified to include lubridate functions
+#Lab 5 Modified to include lubridate functions + join_by()
 
 who_hired <- person |>
-  inner_join(drivers_license, join_by = (license_id = id)) |>
-  inner_join(facebook_event_checkin, by = c("id" = "person_id")) |> #based on jeremy's testimony, searched for the hirer.
-  mutate(date = ymd(date))|>
+  inner_join(drivers_license, join_by(license_id == id)) |>
+  inner_join(facebook_event_checkin, join_by(id == person_id)) |>
+  mutate(date = ymd(date)) |>
   filter(
     hair_color == "red",
     gender == "female",
     car_make == "Tesla",
     car_model == "Model S",
     event_name == "SQL Symphony Concert",
-    year(date) == 2018, month(date) == 12
-  )
+    year(date) == 2017,
+    month(date) == 12
+  ) |>
+  count(name) |>
+  filter(n == 3)
+
 who_hired
 
 ```
@@ -360,9 +368,9 @@ who_hired
 ```{r}
 #| label: wd-5-left-ex-1
 #| 
-#Lab 3 Question 3
+#Lab 4 Question 3 Modified with join_by
 ca_childcare <- ca_childcare |>
-  left_join(tax_rev, by = c("county_name" = "entity_name", "study_year" = "year"))
+  left_join(tax_rev, join_by(county_name == entity_name, study_year == year))
 
 ```
 
@@ -370,9 +378,9 @@ ca_childcare <- ca_childcare |>
 
 ```{r}
 #| label: wd-5-right
-#Lab 3 Question 3 Modified for a right join
+#Lab 4 Question 3 Modified for a right join * with join_by
 ca_childcare <- tax_rev |>
-  right_join(ca_childcare, by = c("entity_name" = "county_name", "year" = "study_year"))
+  right_join(ca_childcare, join_by(entity_name == county_name, year == study_year))
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
@@ -380,9 +388,9 @@ ca_childcare <- tax_rev |>
 ```{r}
 #| label: wd-5-left-right-ex-2
 
-#Lab 4 Question 2
+#Lab 4 Question 2 modifed with join_by
 ca_childcare <- childcare_costs |> 
-  left_join(counties, by = "county_fips_code") |>
+  left_join(counties, join_by(county_fips_code)) |>
   filter(state_name == "California")
 
 
@@ -393,9 +401,9 @@ ca_childcare <- childcare_costs |>
 ```{r}
 #| label: wd-5-inner-ex-1
 
-#Lab 5
+#Lab 5 (modified for join_by changes to all of lab 5)
 witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, join_by = (person_id == id)) |>
+  inner_join(person, join_by(person_id == id)) |>
   filter((address_street_name == "Northwestern Dr"&
          address_number == max(address_number)) |((str_detect(name, "Annabel")&
                     address_street_name == "Franklin Ave"))) |>
@@ -411,12 +419,12 @@ witness_interview
 
 ```{r}
 #| label: wd-5-inner-ex-2
-#Lab 5
+#Lab 5 Modified for join_by
 suspects <- get_fit_now_member |>
   rename(member_id = id, member_name = name) |>
-  inner_join(get_fit_now_check_in, by = c("member_id" = "membership_id")) |>
-  inner_join(person, by = c("person_id" = "id")) |>
-  inner_join(drivers_license, by = c("license_id" = "id")) |> #had to get all the speific data to filter through all the data tables
+  inner_join(get_fit_now_check_in, join_by(member_id == membership_id)) |>
+  inner_join(person, join_by(person_id == id)) |>
+  inner_join(drivers_license, join_by(license_id == id)) |> #had to get all the speific data to filter through all the data tables
   filter(
     membership_status == "gold",
     str_starts(member_id, "48Z"),
@@ -435,10 +443,10 @@ suspects
 ```{r}
 #| label: wd-6-semi
 
-#Lab 5
+#Lab 5 (modified to use join_by)
 suspect_interview <- interview |>
-  inner_join(person, join_by = (person_id = id)) |>
-  semi_join(suspects, join_by = (name = member_name)) |>
+  inner_join(person, join_by(person_id == id)) |>
+  semi_join(suspects, join_by(name == member_name)) |>
   mutate(result = str_c(name, ": ", transcript)) |>
   pull(result) #found the interview of main suspect
 
@@ -451,7 +459,7 @@ suspect_interview
 ```{r}
 #| label: wd-6-anti
 
-#Lab 5 Finding Suspects modified to write code for anti-join to filter out people who aren't suspects
+#Lab 5 Finding Suspects modified to write code for anti-join + join_by to filter out people who aren't suspects
 
 
 not_suspects <- get_fit_now_member |>
@@ -528,11 +536,18 @@ region_median_income <- ca_childcare |>
 
 The following assignments satisfy the above criteria:
 
+-   Lab 1 
 -   Lab 2
--   lab 3
+-   Lab 3
+-   Challenge 3
 -   Lab 4
 -   Lab 5
 -   Challenge 4
+-   Lab 7
+-   Challenge 7
+-   Lab 8
+-   Lab 9
+-   Lab 10
 
 **R-2: I can write well documented and tidy code.**
 
@@ -975,7 +990,7 @@ labs(title = "Median Weekly Childcare Costs More for Infants & Center-Based & \n
 
 ```{r}
 #| label: dvs-3-3
-#Lab 7 Question 3
+#Lab 7 Question 3 Modified for geom_segment()
 fish |>
   group_by(year, section, trip) |>
   summarise(across(everything(), ~ sum(is.na(.x))), .groups = "drop") |>
@@ -1654,14 +1669,12 @@ Throughout the course, I have revised my thinking through assignment revisions, 
 
 ## Extending My Thinking
 
-Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4. In this assignment, I really wanted to dive into the data a little more and use a variety of variables to see what insights and trends were in the data. To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. From this, I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis's appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio.I also learned how to make a new plot using geom_segment() which I included in this portfolio. Overall, I feel like I pushed myself to learn more than just what the quarter's assignments have been looking for. 
+Throughout the course, I extended my thinking in a few ways. One big way was on the challenge assignments. I would choose more difficult challenge options or try to be creative in the questions for those assignments. For example, in challenge 4, we were to have creative freedom to form and answer a research question of our choosing based on the data set for Lab 4.To this, I chose to use facets, colors, column text and dodge columns (that I had learned about for R for a personal project) to find relationships between age, year, and care type for median prices of childcare. In this, I was able to form a plot that was very different from those we had done in class and learn something new about this real life data set. Another big way I extended my thinking was looking into R documentation for many common functions we use in our assignments. I was able to find some interesting function parameters, new functions to use, and new ways to solve similar problems. For example, in lab 4 question 7, I found some parameters for facet_wrap in the documentation to change how the axis's appeared for each box as well as how to change the x-axis scaling in order to match the plot more accurately and efficiently. These examples are present in this portfolio. Overall, I feel like I pushed myself to learn more than just what the quarter's assignments have been looking for. 
 
 ## Peer Support & Collaboration
 
 When it came to peer support and collaboration, I found it was hard to do in college in certain classes. In this class, I think I improved my ability to collaborate in groups and teams on assignments and in feedback. In the peer reviews for assignments each week, I found myself giving good feedback about where they did really well and also little things they could do to make changes, In the lab 2 feedback I wrote,
 
 "Hi! I think your lab looks great! I really liked that you included descriptive labels to all of your plots and that you have tidy code throughout your Quarto document which is great like spaces and extra lines after "+" in your code. The document looks cool, but slightly hard to read. Also your jitter plots are on top of your boxplots which make those a bit harder to see too. Overall, you did a great job on Lab 2!"
-
-While I do have a hard time giving criticism, I thought I did good on talking about what specifically was some areas to fix. While I have other code review that I thought was more detailed, I didn't have any feedback on where they could fix their code which I think is important to highlight.
 
 When it came to the weekly-pair activities and collaboration outside of class, I think I did good on sticking to the coding pair protocol to allow the other person to explain their thoughts while I typed and then sharing my thoughts when it was mine turn to share. But, when we both got stuck, we collaborated really well to find a solution together or ask questions for some hints on where to find the solution. Outside of class, I made time in my schedule to work with peers in a study group way so that if we got stuck, we had ways to share ideas. I think this is the most I have worked outside of class (optionally) with peers which was an improvement for me. Overall, I feel I really improved on my collaboration skills and being able to give feedback to peers.
