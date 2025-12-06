@@ -319,18 +319,36 @@ recreate_plot <- ca_childcare |>
 
 ```{r}
 #| label: wd-4-string
- # Lab 5 (modified for join_by changes to all of lab 5)
-witness_interview <- interview |> # from this we got the persons name, address, id, etc as well as interview transcript
-  inner_join(person, join_by(person_id == id)) |>
-  filter((address_street_name == "Northwestern Dr"&
-         address_number == max(address_number)) |((str_detect(name, "Annabel")&
-                    address_street_name == "Franklin Ave"))) |>
-  select(name, transcript) |>
-    mutate(output = str_c(name, ": ", transcript)) |>
-  pull(output)
+#Lab 8 Question 3
 
+clean_label <- function(x) { #helper function for labels
+  x |>
+    str_replace_all("_", " ") |>
+    str_to_title()
+}
+
+boxplot_func <- function(df, cat_var, num_var) {
   
-witness_interview
+  cat_label <- clean_label(as_label(ensym(cat_var)))
+  num_label <- clean_label(as_label(ensym(num_var)))
+  
+  ggplot(df, aes(x = {{cat_var}}, y = {{num_var}}, fill = {{cat_var}})) +
+    geom_boxplot() +
+    labs(
+      title = str_c(
+        "Distribution of",
+       cat_label,
+        "by",
+        num_label
+      ),
+      x = cat_label,
+      y = num_label,
+      fill = cat_label
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none") 
+  
+}
   
 ```
 
