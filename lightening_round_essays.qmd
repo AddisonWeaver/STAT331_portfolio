@@ -8,7 +8,7 @@ editor: visual
 
 1.  Finish the sentence with another student’s name: "If \[Name of Student\] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
 
-    If Scarlet Kwan doesn't earn an A then nobody should because she did all of her assignments, revisions, and peer reviews while also being a great collaborator/friend when I was having trouble on code outside of class where we could chat about the assignment together to find a solution through a tough spot.
+    If Scarlet Kwan doesn't earn an A , then nobody should because she did all of her assignments, revisions, and peer reviews while also being a great collaborator/friend when I was having trouble on code outside of class where we could chat about the assignment together to find a solution through a tough spot.
 
 2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
 
